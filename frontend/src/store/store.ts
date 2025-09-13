@@ -1,15 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
+import authReducer from './slices/authSlice'
+import uiReducer from './slices/uiSlice'
 
-// Reducers will be added in later tasks
-// import authReducer from './slices/authSlice'
+// Assessment reducer will be added in later tasks
 // import assessmentReducer from './slices/assessmentSlice'
-// import uiReducer from './slices/uiSlice'
 
 export const store = configureStore({
   reducer: {
-    // auth: authReducer,
+    auth: authReducer,
+    ui: uiReducer,
     // assessment: assessmentReducer,
-    // ui: uiReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
