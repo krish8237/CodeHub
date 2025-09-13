@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Type, Optional, List, Dict, Any
+from typing import Generic, TypeVar, Type, Optional, List, Dict, Any, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from app.models.base import BaseModel
@@ -13,19 +13,22 @@ class BaseRepository(Generic[ModelType]):
         self.model = model
         self.db = db
     
-    def create(self, obj_data: Dict[str, Any]) -> ModelType:
+    async def create(self, obj_in: Union[Dict[str, Any], ModelType]) -> ModelType:
         """Create a new record"""
-        db_obj = self.model(**obj_data)
+        if isinstance(obj_in, dict):
+            db_obj = self.model(**obj_in)
+        else:
+            db_obj = obj_in
         self.db.add(db_obj)
         self.db.commit()
         self.db.refresh(db_obj)
         return db_obj
     
-    def get(self, id: int) -> Optional[ModelType]:
+    async def get_by_id(self, id: int) -> Optional[ModelType]:
         """Get a record by ID"""
         return self.db.query(self.model).filter(self.model.id == id).first()
     
-    def get_multi(
+    async def get_multi(
         self, 
         skip: int = 0, 
         limit: int = 100,
@@ -50,27 +53,22 @@ class BaseRepository(Generic[ModelType]):
         
         return query.offset(skip).limit(limit).all()
     
-    def update(self, id: int, obj_data: Dict[str, Any]) -> Optional[ModelType]:
-        """Update a record by ID"""
-        db_obj = self.get(id)
-        if db_obj:
-            for key, value in obj_data.items():
-                if hasattr(db_obj, key):
-                    setattr(db_obj, key, value)
-            self.db.commit()
-            self.db.refresh(db_obj)
-        return db_obj
+    async def update(self, obj_in: ModelType) -> ModelType:
+        """Update a record"""
+        self.db.commit()
+        self.db.refresh(obj_in)
+        return obj_in
     
-    def delete(self, id: int) -> bool:
+    async def delete(self, id: int) -> bool:
         """Delete a record by ID"""
-        db_obj = self.get(id)
+        db_obj = await self.get_by_id(id)
         if db_obj:
             self.db.delete(db_obj)
             self.db.commit()
             return True
         return False
     
-    def count(self, filters: Optional[Dict[str, Any]] = None) -> int:
+    async def count(self, filters: Optional[Dict[str, Any]] = None) -> int:
         """Count records with optional filtering"""
         query = self.db.query(self.model)
         
@@ -84,11 +82,11 @@ class BaseRepository(Generic[ModelType]):
         
         return query.count()
     
-    def exists(self, id: int) -> bool:
+    async def exists(self, id: int) -> bool:
         """Check if a record exists by ID"""
         return self.db.query(self.model).filter(self.model.id == id).first() is not None
     
-    def bulk_create(self, obj_data_list: List[Dict[str, Any]]) -> List[ModelType]:
+    async def bulk_create(self, obj_data_list: List[Dict[str, Any]]) -> List[ModelType]:
         """Create multiple records in bulk"""
         db_objs = [self.model(**obj_data) for obj_data in obj_data_list]
         self.db.add_all(db_objs)

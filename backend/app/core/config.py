@@ -42,6 +42,9 @@ class Settings(BaseSettings):
     # CORS
     allowed_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
     
+    # Frontend URL for email links
+    frontend_url: str = "http://localhost:3000"
+    
     class Config:
         env_file = ".env"
         case_sensitive = False

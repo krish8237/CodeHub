@@ -63,8 +63,10 @@ async def health_check():
     return {"status": "healthy", "environment": settings.environment}
 
 
-# Include API routers (will be added in later tasks)
-# app.include_router(auth_router, prefix="/api/v1/auth", tags=["authentication"])
+# Include API routers
+from app.api.auth import router as auth_router
+
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["authentication"])
 # app.include_router(assessment_router, prefix="/api/v1/assessments", tags=["assessments"])
 # app.include_router(execution_router, prefix="/api/v1/execution", tags=["code-execution"])
 # app.include_router(analytics_router, prefix="/api/v1/analytics", tags=["analytics"])

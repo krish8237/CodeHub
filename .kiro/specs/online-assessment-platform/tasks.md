@@ -30,7 +30,12 @@
   - Write unit tests for data models and validation
   - _Requirements: 6.1, 1.1, 4.1_
 
-- [ ] 3. Build authentication and authorization system
+- [x] 3. Build authentication and authorization system
+
+
+
+
+
 
 
 

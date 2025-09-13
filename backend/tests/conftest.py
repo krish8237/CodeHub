@@ -2,8 +2,10 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-from app.core.database import Base
+from app.core.database import Base, get_db
 from app.models import *  # Import all models
+from app.models.user import User, UserRole
+from app.core.security import get_password_hash, create_access_token
 
 
 # Create in-memory SQLite database for testing
@@ -18,8 +20,17 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+def override_get_db():
+    """Override database dependency for testing"""
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+
 @pytest.fixture(scope="function")
-def db_session():
+def db():
     """Create a fresh database session for each test"""
     # Create all tables
     Base.metadata.create_all(bind=engine)
@@ -33,6 +44,111 @@ def db_session():
         session.close()
         # Drop all tables after test
         Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture
+def test_user(db):
+    """Create a test user"""
+    user = User(
+        email="test@example.com",
+        password_hash=get_password_hash("testpass123"),
+        first_name="John",
+        last_name="Doe",
+        role=UserRole.STUDENT,
+        is_active=True,
+        is_verified=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def unverified_user(db):
+    """Create an unverified test user"""
+    user = User(
+        email="unverified@example.com",
+        password_hash=get_password_hash("testpass123"),
+        first_name="Unverified",
+        last_name="User",
+        role=UserRole.STUDENT,
+        is_active=True,
+        is_verified=False
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def instructor_user(db):
+    """Create a test instructor user"""
+    user = User(
+        email="instructor@example.com",
+        password_hash=get_password_hash("testpass123"),
+        first_name="Jane",
+        last_name="Instructor",
+        role=UserRole.INSTRUCTOR,
+        is_active=True,
+        is_verified=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def admin_user(db):
+    """Create a test admin user"""
+    user = User(
+        email="admin@example.com",
+        password_hash=get_password_hash("testpass123"),
+        first_name="Admin",
+        last_name="User",
+        role=UserRole.ADMIN,
+        is_active=True,
+        is_verified=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@pytest.fixture
+def auth_headers(test_user):
+    """Create authorization headers for test user"""
+    token = create_access_token(
+        subject=test_user.email,
+        user_id=test_user.id,
+        role=test_user.role.value
+    )
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def instructor_auth_headers(instructor_user):
+    """Create authorization headers for instructor user"""
+    token = create_access_token(
+        subject=instructor_user.email,
+        user_id=instructor_user.id,
+        role=instructor_user.role.value
+    )
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture
+def admin_auth_headers(admin_user):
+    """Create authorization headers for admin user"""
+    token = create_access_token(
+        subject=admin_user.email,
+        user_id=admin_user.id,
+        role=admin_user.role.value
+    )
+    return {"Authorization": f"Bearer {token}"}
 
 
 @pytest.fixture
