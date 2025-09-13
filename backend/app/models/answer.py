@@ -20,7 +20,7 @@ class Answer(BaseModel):
     test_results = Column(JSON, nullable=True)  # Test case results
     
     # Additional metadata
-    metadata = Column(JSON, nullable=True)  # Additional answer-specific data
+    answer_metadata = Column(JSON, nullable=True)  # Additional answer-specific data
     
     # Relationships
     attempt = relationship("AssessmentAttempt", back_populates="answers")

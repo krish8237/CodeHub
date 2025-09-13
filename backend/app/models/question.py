@@ -31,7 +31,7 @@ class Question(BaseModel):
     correct_answers = Column(JSON, nullable=True)  # Correct answer indices
     
     # General metadata
-    metadata = Column(JSON, nullable=True)  # Additional question-specific data
+    question_metadata = Column(JSON, nullable=True)  # Additional question-specific data
     
     # Relationships
     assessment = relationship("Assessment", back_populates="questions")

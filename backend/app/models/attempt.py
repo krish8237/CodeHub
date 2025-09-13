@@ -24,7 +24,7 @@ class AssessmentAttempt(BaseModel):
     time_taken = Column(Integer, nullable=True)  # in seconds
     total_score = Column(Float, nullable=True)
     max_score = Column(Float, nullable=True)
-    metadata = Column(JSON, nullable=True)  # Additional attempt data
+    attempt_metadata = Column(JSON, nullable=True)  # Additional attempt data
     
     # Relationships
     user = relationship("User", back_populates="assessment_attempts")
