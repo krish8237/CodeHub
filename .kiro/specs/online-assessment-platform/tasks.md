@@ -17,7 +17,12 @@
   - Set up environment configuration files and secrets management
   - _Requirements: 6.1, 6.2_
 
-- [ ] 2. Implement core data models and database schema
+- [x] 2. Implement core data models and database schema
+
+
+
+
+
   - Create SQLAlchemy models for User, Assessment, Question, Attempt, and Answer entities
   - Implement Alembic migrations for database schema creation
   - Add database connection utilities and session management
@@ -26,6 +31,10 @@
   - _Requirements: 6.1, 1.1, 4.1_
 
 - [ ] 3. Build authentication and authorization system
+
+
+
+
   - Implement JWT token generation and validation utilities
   - Create user registration endpoint with email verification
   - Build login/logout endpoints with secure session management
