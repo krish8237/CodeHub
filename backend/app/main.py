@@ -66,10 +66,11 @@ async def health_check():
 # Include API routers
 from app.api.auth import router as auth_router
 from app.api.assessments import router as assessment_router
+from app.api.execution import router as execution_router
 
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["authentication"])
 app.include_router(assessment_router, prefix="/api/v1/assessments", tags=["assessments"])
-# app.include_router(execution_router, prefix="/api/v1/execution", tags=["code-execution"])
+app.include_router(execution_router, prefix="/api/v1/execution", tags=["code-execution"])
 # app.include_router(analytics_router, prefix="/api/v1/analytics", tags=["analytics"])
 # app.include_router(export_router, prefix="/api/v1/export", tags=["export"])
 # app.include_router(tutorial_router, prefix="/api/v1/tutorials", tags=["tutorials"])
